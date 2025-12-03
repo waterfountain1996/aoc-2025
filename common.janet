@@ -12,3 +12,8 @@
   "Returns a modulo b. Equivalent to Python's % operator"
   [a b]
   (- a (* b (floordiv a b))))
+
+(defn find-max-index
+  "Returns the index of the largest number in arrtup"
+  [arrtup]
+  (find-index |(= $ (max-of arrtup)) arrtup))

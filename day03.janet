@@ -23,14 +23,6 @@
           (+ (* (get bank i) 10) (get bank j))))
       (if (empty? combinations) 0 (max-of combinations)))))
 
-(defn find-max-index
-  "Returns the index of the largest number in arrtup"
-  [arrtup]
-  (var res 0)
-  (loop [[i val] :pairs arrtup]
-    (when (> val (get arrtup res)) (set res i)))
-  res)
-
 (defn max-joltage2
   [bank]
   (def [_ jolts]
