@@ -23,23 +23,26 @@
           (+ (* (get bank i) 10) (get bank j))))
       (if (empty? combinations) 0 (max-of combinations)))))
 
+(defn find-max-index
+  "Returns the index of the largest number in arrtup"
+  [arrtup]
+  (var res 0)
+  (loop [[i val] :pairs arrtup]
+    (when (> val (get arrtup res)) (set res i)))
+  res)
+
 (defn max-joltage2
   [bank]
-
-  (defn get-cell
-    [power bank]
-    (var cell-index 0)
-    (loop [[i jolts] :pairs (tuple/slice bank 0 (- (length bank) power))]
-      (when (> jolts (get bank cell-index)) (set cell-index i)))
-    [(get bank cell-index) (tuple/slice bank (inc cell-index))])
-
-  (var subbank bank)
-  (var out 0)
-  (loop [power :in (range 11 -1 -1)]
-    (def [jolts tail] (get-cell power subbank))
-    (set subbank tail)
-    (set out (+ out (* jolts (math/pow 10 power)))))
-  out)
+  (def [_ jolts]
+    (reduce
+      (fn
+        [[bank jolts] power]
+        (def idx (find-max-index (tuple/slice bank 0 (- (length bank) power))))
+        [(tuple/slice bank (inc idx))
+         (+ jolts (* (get bank idx) (math/pow 10 power)))])
+      [bank 0]
+      (range 11 -1 -1)))
+  jolts)
 
 (test/start-suite :gold)
 (loop [[bank want] :in [[[9 8 7 6 5 4 3 2 1 1 1 1 1 1 1] 987654321111]
