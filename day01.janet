@@ -12,11 +12,7 @@ L99
 R14
 L82`)
 
-(def- input (with
-            [file-handle
-             (file/open "inputs/day01.txt")
-             (fn [fd] (file/close fd))]
-            (file/read file-handle :all)))
+(def- input (string/trim (slurp "inputs/day01.txt")))
 
 (defn- reducer
   [acc m]
@@ -32,8 +28,8 @@ L82`)
   (def raw (+ pos turn))
 
   (def zeros (+
-              (floordiv (math/abs raw) 100)
-              (bool2num (and (not (zero? pos)) (<= raw 0)))))
+               (floordiv (math/abs raw) 100)
+               (bool2num (and (not (zero? pos)) (<= raw 0)))))
 
   [(wrapmod raw 100)
    (+ rotations zeros)])
@@ -44,9 +40,9 @@ L82`)
   (def lines (map |(string/trim $) (string/split "\n" (string/trim input))))
   (def instructions (map |(peg/match grammar $) lines))
   (def moves
-    (map 
+    (map
       (fn [instr]
-        (def n (scan-number (get instr 1))) 
+        (def n (scan-number (get instr 1)))
         (if (= (get instr 0) "L") (- n) n))
       instructions))
   moves)
