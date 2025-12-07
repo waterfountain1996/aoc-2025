@@ -26,58 +26,36 @@
 
 (def SPLITTER (chr "^"))
 
-(defn run
+(defn count-splits
   [grid row col cache]
-  (def tail (array/slice grid (inc row)))
-  (def offset (find-index |(= (get $ col) SPLITTER) tail))
-
-  (if-not (nil? offset)
-    (do
-      (def next-row (+ row offset 1))
-      (when (nil? (in cache [next-row col]))
-        (set (cache [next-row col]) true)
-        (run grid next-row (dec col) cache)
-        (run grid next-row (inc col) cache)))))
-
-(defn solve-p1
-  [grid]
-  (def col (index-of (chr "S") (first grid)))
-  (def cache @{})
-  (run grid 0 col cache)
+  (if-let [offset (find-index |(= (get $ col) SPLITTER) (array/slice grid row))]
+    (let [next-row (+ row offset)
+          key [next-row col]
+          c1 (dec col)
+          c2 (inc col)]
+      (when (not (has-key? cache key))
+        (set (cache key) :seen)
+        (count-splits grid next-row c1 cache)
+        (count-splits grid next-row c2 cache))))
   (length cache))
 
-(defn run2
-  [grid row col cache]
-  (def tail (array/slice grid (inc row)))
-  (def offset (find-index |(= (get $ col) SPLITTER) tail))
-
-  (if (nil? offset)
-    1
-    (do
-      (def next-row (+ row offset 1))
-
-      (when (nil? (in cache [next-row (dec col)]))
-        (set (cache [next-row (dec col)]) (run2 grid next-row (dec col) cache)))
-
-      (when (nil? (in cache [next-row (inc col)]))
-        (set (cache [next-row (inc col)]) (run2 grid next-row (inc col) cache)))
-
+(defn count-quantum-splits
+  [grid row col]
+  (if-let [offset (find-index |(= (get $ col) SPLITTER) (array/slice grid row))]
+    (let [next-row (+ row offset)
+          c1 (dec col)
+          c2 (inc col)]
       (+
-        (in cache [next-row (dec col)])
-        (in cache [next-row (inc col)])))))
-
-(defn solve-p2
-  [grid]
-  (def col (index-of (chr "S") (first grid)))
-  (def cache @{})
-  (run2 grid 0 col cache))
+        (memoize (count-quantum-splits grid next-row c1))
+        (memoize (count-quantum-splits grid next-row c2))))
+    1))
 
 (defn solve
   [part input]
   (def grid (parse-input input))
   (case part
-    :p1 (solve-p1 grid)
-    :p2 (solve-p2 grid)))
+    :p1 (count-splits grid 0 (index-of (chr "S") (first grid)) @{})
+    :p2 (count-quantum-splits grid 0 (index-of (chr "S") (first grid)))))
 
 (print (solve :p1 input))
 (print (solve :p2 input))

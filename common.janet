@@ -17,3 +17,15 @@
   "Returns the index of the largest number in arrtup"
   [arrtup]
   (find-index |(= $ (max-of arrtup)) arrtup))
+
+(defmacro memoize [form]
+  "Memoize the result of evaluation of form"
+  (def results @{})
+  (defn memoize-call [f & args]
+    (def memoization-key [f args])
+    (if (has-key? results memoization-key)
+      (in results memoization-key)
+      (let [result (f ;args)]
+        (put results memoization-key result)
+        result)))
+  ~(,memoize-call ,;form))
